@@ -57,14 +57,14 @@ public class Controller : MonoBehaviour
 
     public Transform transform;
     public Rigidbody rigidbody;
-    public HeadBob headBob;
+    //public HeadBob headBob;
 
+    public float height;
     public float xSensitivity;
     public float zSensitivity;
 
     public float maxGroundSpeed;
     public float groundAcceleration;
-
     public float airAcceleration;
     public float gravityAcceleration;
     public float drag;
@@ -73,7 +73,7 @@ public class Controller : MonoBehaviour
     private Quaternion ogQuat;
     private float yRotation;
     private float zRotation;
-    private bool grounded;
+    private Vector3 respawnPosition;
 
     // Declare the keys that will be used to detect movement.
     private System.String xAxisInput;
@@ -83,12 +83,14 @@ public class Controller : MonoBehaviour
     private KeyCode leftKey;
     private KeyCode rightKey;
     private KeyCode jumpKey;
+    private KeyCode respawnKey;
 
     void Start () 
     {
         ogQuat = transform.localRotation;
         yRotation = transform.eulerAngles.y;
         zRotation = transform.eulerAngles.z;
+        respawnPosition = transform.position;
         
         // Set the keys used for movment detection.
         xAxisInput = "Mouse X";
@@ -98,6 +100,18 @@ public class Controller : MonoBehaviour
         leftKey = KeyCode.A;
         rightKey = KeyCode.D;
         jumpKey = KeyCode.Space;
+        respawnKey = KeyCode.R;
+    }
+
+    Vector3 ScaleBackVector(Vector3 vector, float max_magnitude)
+    {
+        float magnitude = vector.magnitude;
+        if(magnitude > max_magnitude)
+        {
+            float scale = max_magnitude / magnitude;
+            vector *= scale;
+        }
+        return vector;
     }
 
     Vector3 Decelerate(Vector3 velocity)
@@ -113,7 +127,7 @@ public class Controller : MonoBehaviour
         
         // Bring the velocity closer to the zero vector.
         Vector3 velocity_unit = velocity.normalized;
-        velocity -= Time.deltaTime * groundAcceleration * velocity_unit;
+        velocity -= Time.smoothDeltaTime * groundAcceleration * velocity_unit;
 
         // If we happen to pass over the zero vector, that means the player
         // should stop moving.
@@ -123,6 +137,36 @@ public class Controller : MonoBehaviour
             velocity = new Vector3(0.0f, 0.0f, 0.0f);
         }
         return velocity;
+    }
+
+    bool ApplyMovementKeys(out Vector3 d_velocity, 
+                           Vector3 forward, 
+                           Vector3 left, 
+                           float acceleration)
+    {
+        bool input = false;
+        d_velocity = new Vector3(0.0f, 0.0f, 0.0f);
+        if(Input.GetKey(forwardKey))
+        {
+            d_velocity += Time.smoothDeltaTime * acceleration * forward;
+            input = true;
+        }
+        if(Input.GetKey(backwardKey))
+        {
+            d_velocity -= Time.smoothDeltaTime * acceleration * forward;
+            input = true;
+        }
+        if(Input.GetKey(leftKey))
+        {
+            d_velocity += Time.smoothDeltaTime * acceleration * left;
+            input = true;
+        }
+        if(Input.GetKey(rightKey))
+        {
+            d_velocity -= Time.smoothDeltaTime * acceleration * left;
+            input = true;
+        }
+        return input;
     }
 
     Vector3 GroundMovement(Vector3 velocity, Vector3 forward, Vector3 left)
@@ -136,29 +180,11 @@ public class Controller : MonoBehaviour
             return velocity;
         }
 
-        // Find the change in the velocity of the player.
-        bool input = false;
-        Vector3 d_velocity = new Vector3(0.0f, 0.0f, 0.0f);
-        if(Input.GetKey(forwardKey))
-        {
-            d_velocity += Time.deltaTime * groundAcceleration * forward;
-            input = true;
-        }
-        if(Input.GetKey(backwardKey))
-        {
-            d_velocity -= Time.deltaTime * groundAcceleration * forward;
-            input = true;
-        }
-        if(Input.GetKey(leftKey))
-        {
-            d_velocity += Time.deltaTime * groundAcceleration * left;
-            input = true;
-        }
-        if(Input.GetKey(rightKey))
-        {
-            d_velocity -= Time.deltaTime * groundAcceleration * left;
-            input = true;
-        }
+        Vector3 d_velocity;
+        bool input = ApplyMovementKeys(out d_velocity, 
+                                       forward, 
+                                       left, 
+                                       groundAcceleration);
 
         // If the player provides no input, we bring the velocity back down to
         // zero.
@@ -171,33 +197,66 @@ public class Controller : MonoBehaviour
         // we scale the velocity vector back to have a magnitude equivalent to
         // maxGroundSpeed.
         velocity += d_velocity;
-        float speed = velocity.magnitude;
-        if(speed > maxGroundSpeed)
-        {
-            float scale = maxGroundSpeed / speed;
-            velocity *= scale;
-        }
+        velocity = ScaleBackVector(velocity, maxGroundSpeed);
 
         return velocity;
     }
 
     Vector3 AirMovement(Vector3 velocity, Vector3 forward, Vector3 left)
     {
-        velocity -= Time.deltaTime * gravityAcceleration * Vector3.down; 
+        Vector3 d_velocity;
+        ApplyMovementKeys(out d_velocity, forward, left, airAcceleration);
+        d_velocity -= Time.smoothDeltaTime * gravityAcceleration * Vector3.down;
+        
+        velocity += d_velocity;
         return velocity;
     }
 
+    bool TestGrounded()
+    {
+        Ray ground_ray = new Ray();
+        Vector3 ray_direction = new Vector3(0.0f, -1.0f, 0.0f);
+        ground_ray.origin = transform.position;
+        ground_ray.direction = ray_direction;
+
+        RaycastHit hit_information;
+        bool hit = Physics.Raycast(ground_ray, out hit_information);
+        if(hit && hit_information.distance <= height)
+        {
+            Vector3 new_position = hit_information.point;
+            new_position.y += height;
+            transform.position = new_position;
+            return true;
+        }
+        return false;
+    }
+
+    void CheckRespawn()
+    {
+        if(Input.GetKeyDown(respawnKey))
+        {
+            transform.position = respawnPosition;
+            rigidbody.velocity = new Vector3(0.0f, 0.0f, 0.0f);
+        }
+    }
+
+
     void Update () 
     {
+        // This function is for testing and should be removed for the actual
+        // game.
+        CheckRespawn();
+
+
         // Apply the rotation around the y axis with the x axis mouse input.
         float x_input = Input.GetAxis(xAxisInput);
-        float d_y_rotation = Time.deltaTime * x_input * xSensitivity * 360.0f;
+        float d_y_rotation = Time.unscaledDeltaTime * x_input * xSensitivity * 360.0f;
         yRotation += d_y_rotation;
         yRotation %= 360.0f;
 
-        // Do the same same for the rotation around the z axis.
+        // Do the same for the rotation around the z axis.
         float y_input = Input.GetAxis(yAxisInput);
-        float d_z_rotation = Time.deltaTime * y_input * zSensitivity * 360.0f;
+        float d_z_rotation = Time.unscaledDeltaTime * y_input * zSensitivity * 360.0f;
         zRotation += d_z_rotation;
         zRotation = Mathf.Clamp(zRotation, -90.0f, 90.0f);
         
@@ -234,6 +293,7 @@ public class Controller : MonoBehaviour
 
         // Apply ground movement controls when the player is on the ground and
         // air movement controls when they are not.
+        bool grounded = TestGrounded();
         if(grounded)
         {
             velocity = GroundMovement(velocity, forward_heading, left_heading);
@@ -250,36 +310,18 @@ public class Controller : MonoBehaviour
             {
                 head_bob_contribution = speed / maxGroundSpeed;
             }
-            headBob.UpdateContribution(head_bob_contribution);
+            //headBob.UpdateContribution(head_bob_contribution);
         }
         else
         {
             velocity = AirMovement(velocity, forward_heading, left_heading);
 
             // Do not perform head bobbing while flying through the air.
-            headBob.UpdateContribution(0.0f);
+            //headBob.UpdateContribution(0.0f);
         }
         
         // Reset the velocity of the rigidody for the next physics updat.
         rigidbody.velocity = velocity;
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        // The player is grounded when they collide with the ground.
-        if(collision.gameObject.CompareTag("ground"))
-        {
-            grounded = true;
-        }
-    }
-
-    void OnCollisionExit(Collision collision)
-    {
-        // The player is not grounded when they exit collision with the ground.
-        if(collision.gameObject.CompareTag("ground"))
-        {
-            grounded = false;
-        }
     }
 }
 
