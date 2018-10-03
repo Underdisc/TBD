@@ -59,6 +59,10 @@ public class Controller : MonoBehaviour
     public Rigidbody rigidbody;
     //public HeadBob headBob;
 
+    // Should be seperated from the controller
+    public float bounceSpeed;
+    public float maxBounceSpeed;
+
     public float height;
     public float xSensitivity;
     public float zSensitivity;
@@ -212,20 +216,18 @@ public class Controller : MonoBehaviour
         return velocity;
     }
 
-    bool TestGrounded()
+    bool GetGround(out RaycastHit hit_information)
     {
+        // Create the ray pointing down from the player's position.
         Ray ground_ray = new Ray();
         Vector3 ray_direction = new Vector3(0.0f, -1.0f, 0.0f);
         ground_ray.origin = transform.position;
         ground_ray.direction = ray_direction;
 
-        RaycastHit hit_information;
+        // Test to see if the player is standing on the object.
         bool hit = Physics.Raycast(ground_ray, out hit_information);
         if(hit && hit_information.distance <= height)
         {
-            Vector3 new_position = hit_information.point;
-            new_position.y += height;
-            transform.position = new_position;
             return true;
         }
         return false;
@@ -233,6 +235,7 @@ public class Controller : MonoBehaviour
 
     void CheckRespawn()
     {
+        // Reset the playes position if they hit the respawn key.
         if(Input.GetKeyDown(respawnKey))
         {
             transform.position = respawnPosition;
@@ -247,16 +250,17 @@ public class Controller : MonoBehaviour
         // game.
         CheckRespawn();
 
-
         // Apply the rotation around the y axis with the x axis mouse input.
         float x_input = Input.GetAxis(xAxisInput);
-        float d_y_rotation = Time.unscaledDeltaTime * x_input * xSensitivity * 360.0f;
+        float d_y_rotation = Time.unscaledDeltaTime * x_input * xSensitivity * 
+                             360.0f;
         yRotation += d_y_rotation;
         yRotation %= 360.0f;
 
         // Do the same for the rotation around the z axis.
         float y_input = Input.GetAxis(yAxisInput);
-        float d_z_rotation = Time.unscaledDeltaTime * y_input * zSensitivity * 360.0f;
+        float d_z_rotation = Time.unscaledDeltaTime * y_input * zSensitivity * 
+                             360.0f;
         zRotation += d_z_rotation;
         zRotation = Mathf.Clamp(zRotation, -90.0f, 90.0f);
         
@@ -291,26 +295,42 @@ public class Controller : MonoBehaviour
         // physics. 
         Vector3 velocity = rigidbody.velocity;
 
-        // Apply ground movement controls when the player is on the ground and
-        // air movement controls when they are not.
-        bool grounded = TestGrounded();
+        RaycastHit hit_information;
+        bool grounded = GetGround(out hit_information);
+        
         if(grounded)
         {
-            velocity = GroundMovement(velocity, forward_heading, left_heading);
-
-            // Update the head bob contribution depending on how close the 
-            // player is to the max speed.
-            float speed = velocity.magnitude;
-            float head_bob_contribution;
-            if(speed == 0.0f)
+            // This should be seperated into another script.
+            GameObject ground_object = hit_information.collider.gameObject;
+            if(ground_object.CompareTag("Bounce"))
             {
-                head_bob_contribution = 0.0f;
+                Vector3 bounceDirection = new Vector3(0.0f, 1.0f, 0.0f);
+                velocity = bounceSpeed * bounceDirection;
+                velocity = ScaleBackVector(velocity, maxBounceSpeed);
             }
             else
             {
+                Vector3 new_position = hit_information.point;
+                new_position.y += height;
+                transform.position = new_position;
+                velocity = GroundMovement(velocity,
+                                          forward_heading, 
+                                          left_heading);
+
+                // Update the head bob contribution depending on how close the 
+                // player is to the max speed.
+                float speed = velocity.magnitude;
+                float head_bob_contribution;
+                if(speed == 0.0f)
+                {
+                    head_bob_contribution = 0.0f;
+                }
+                else
+                {
                 head_bob_contribution = speed / maxGroundSpeed;
+                }
+                //headBob.UpdateContribution(head_bob_contribution);
             }
-            //headBob.UpdateContribution(head_bob_contribution);
         }
         else
         {

@@ -14,14 +14,4 @@ public class UIUpdate : MonoBehaviour
         string new_text = "Energy: " + string_percentage + "%";
         objectTextMesh.text = new_text;
     }
-
-    void Start ()
-    {
-        
-    }
-  
-    void Update ()
-    {
-    
-    }
 }

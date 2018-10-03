@@ -37,6 +37,7 @@ public class BulletTime : MonoBehaviour
 
     void Update () 
     {
+        // Switch time scale modes on key press.
         if(Input.GetKeyDown(bulletTimeKey))
         {
             OnTimeSwitch();
@@ -44,6 +45,8 @@ public class BulletTime : MonoBehaviour
 
         if(inBulletTime)
         {
+            // Decrease energy and switch time scale modes if the player is out 
+            // of energy.
             currentEnergy -= depletionRate * Time.unscaledDeltaTime;
             if(currentEnergy <= 0.0f)
             {
@@ -53,6 +56,7 @@ public class BulletTime : MonoBehaviour
         }
         else if(currentEnergy < maxEnergy)
         {
+            // Increase energy until we reach the energy cap.
             currentEnergy += regenerationRate * Time.unscaledDeltaTime;
             if(currentEnergy > maxEnergy)
             {
@@ -60,6 +64,7 @@ public class BulletTime : MonoBehaviour
             }
         }
 
+        // Update the UI with the new energy value.
         float energy_percentage = currentEnergy / maxEnergy;
         uiObject.SendMessage("OnEnergyUpdate", energy_percentage);
     }
