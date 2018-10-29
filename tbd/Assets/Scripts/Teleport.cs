@@ -4,10 +4,14 @@ using UnityEngine;
 
 // Tron amnesia
 
+// teleport will set time scale to zero
+
 public class Teleport : MonoBehaviour 
 {
-    private delegate void RunDelegate();
-    private RunDelegate run;
+    // Player and Other teleport functions
+    private delegate void VoidDelegateVoid();
+    private VoidDelegateVoid run;
+    private VoidDelegateVoid teleport;
 
     public float rightEmissionOffset;
     public float downEmissionOffset;
@@ -17,17 +21,60 @@ public class Teleport : MonoBehaviour
     public bool isPlayer = false;
     public int teleportButton = 0;
 
-    private int clickCount = 0;
-    private bool performTeleport = false;
 
-    void OnTeleport(GameObject other)
+    public static float teleportTime = 0.1f;
+    private bool testTeleport = false;
+    private bool performingTeleport = false;
+    private float originalTimeScale;
+    private float teleportTimeRemaining;
+    private Vector3 startPosition;
+    private Vector3 teleportDestination;
+    private bool otherObjectTeleported = false;
+    private Transform teleportObjectTransform;
+
+    void StartTeleport(GameObject other)
     {
-        Vector3 old_position = this.transform.position;
-        this.transform.position = other.transform.position;
-        other.transform.position = old_position;
+        performingTeleport = true;
+        originalTimeScale = Time.timeScale;
+        Time.timeScale = 0.0f;
+        teleportTimeRemaining = teleportTime;
+        startPosition = transform.position;
+        teleportObjectTransform = other.GetComponent<Transform>();
+        teleportDestination = teleportObjectTransform.position;
+    }
+
+    void EndTeleport()
+    {
+        performingTeleport = false;
+        Time.timeScale = originalTimeScale;
+    }
+
+    void PlayerTeleport()
+    {
+        // This should be exchanged for a quadratic in and out linear interpolation
+        // function.
+
+        // We need to spawn the effect as well.
+        Vector3 toDestination = teleportDestination - startPosition;
+        teleportTimeRemaining -= Time.unscaledDeltaTime;
+        if(teleportTimeRemaining <= 0.0f)
+        {
+            teleportTimeRemaining = 0.0f;
+            EndTeleport();
+        }
+
+        float perc = 1.0f - (teleportTimeRemaining / teleportTime);
+        transform.position = startPosition + toDestination * perc; 
+
+        // We need to create the particle effect around the teleporter.
+        if(perc < 0.5f && !otherObjectTeleported)
+        {
+            teleportObjectTransform.position = startPosition;
+        }
+
     }
     
-    void TryRaycast()
+    void TryTeleport()
     {
         bool hit_occured;
         RaycastHit hit_information;
@@ -46,15 +93,15 @@ public class Teleport : MonoBehaviour
                                       out hit_information);
 
         Vector3 start = position + right * rightEmissionOffset;
-            start -= up * downEmissionOffset;
+        start -= up * downEmissionOffset;
         Vector3 end;
 
         if(hit_occured)
         {
             GameObject hit_object = hit_information.collider.gameObject;
-            if(hit_object.CompareTag("Enemy"))
+            if(hit_object.CompareTag("Teleporter"))
             {
-                OnTeleport(hit_object);
+                StartTeleport(hit_object);
             }
             end = hit_information.point;
         }
@@ -68,10 +115,10 @@ public class Teleport : MonoBehaviour
 
     void FixedUpdate () 
     {
-        if(performTeleport)
+        if(testTeleport)
         {
-            TryRaycast();
-            performTeleport = false;
+            TryTeleport();
+            testTeleport = false;
         }
     }
 
@@ -79,28 +126,21 @@ public class Teleport : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(teleportButton))
         {
-            performTeleport = true;
+            testTeleport = true;
         }
     }
-
-    void OtherUpdate()
-    {}
 
     void Update()
     {
-        run();
-    }
-
-    void OnEnable()
-    {
-        if(isPlayer)
+        if(performingTeleport)
         {
-            run = PlayerUpdate;
+            PlayerTeleport();
         }
         else
         {
-            run = OtherUpdate;
+            PlayerUpdate();
         }
+        
     }
 }
 
