@@ -6,14 +6,11 @@ public class BouncePad : MonoBehaviour
 {
 
     public float bounceSpeed;
-    public float maxBounceSpeed;
+    private Vector3 bounceVector;
 
-    private Vector3 bounceDirection;
-
-    Vector3 PerformBounce(Vector3 velocity)
+    public Vector3 PerformBounce()
     {
-        velocity = bounceDirection * bounceSpeed;
-        return velocity;
+        return bounceVector;
     }
 
     void Update()
@@ -21,7 +18,7 @@ public class BouncePad : MonoBehaviour
         Transform objectTransform = gameObject.GetComponent("Transform") as Transform;
 
         Vector3 start = objectTransform.position;
-        Vector3 end = start + bounceDirection * 5.0f;
+        Vector3 end = start + bounceVector;
         Debug.DrawLine(start, end, Color.green);
     }
 
@@ -30,7 +27,8 @@ public class BouncePad : MonoBehaviour
         Transform objectTransform = gameObject.GetComponent("Transform") as Transform;
         Quaternion object_quat = objectTransform.rotation;
 
-        bounceDirection = new Vector3(0.0f, 1.0f, 0.0f);
+        Vector3 bounceDirection = new Vector3(0.0f, 1.0f, 0.0f);
         bounceDirection = object_quat * bounceDirection;
+        bounceVector = bounceSpeed * bounceDirection;
     }
 }

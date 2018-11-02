@@ -8,10 +8,6 @@ using UnityEngine;
 
 public class Teleport : MonoBehaviour 
 {
-    // Player and Other teleport functions
-    private delegate void VoidDelegateVoid();
-    private VoidDelegateVoid run;
-    private VoidDelegateVoid teleport;
 
     public float rightEmissionOffset;
     public float downEmissionOffset;
@@ -22,7 +18,10 @@ public class Teleport : MonoBehaviour
     public int teleportButton = 0;
 
 
-    public static float teleportTime = 0.1f;
+    public float teleportTime = 0.1f;
+    public GameObject TeleportLaserEffect;
+
+    private bool usedTeleport = false;
     private bool testTeleport = false;
     private bool performingTeleport = false;
     private float originalTimeScale;
@@ -31,6 +30,8 @@ public class Teleport : MonoBehaviour
     private Vector3 teleportDestination;
     private bool otherObjectTeleported = false;
     private Transform teleportObjectTransform;
+
+    public GameObject teleportBarrel;
 
     void StartTeleport(GameObject other)
     {
@@ -49,6 +50,38 @@ public class Teleport : MonoBehaviour
         Time.timeScale = originalTimeScale;
     }
 
+    // Starts slowly and appproaches quickly.
+    float QuadOut(float perc)
+    {
+        return perc * perc;
+    }
+
+    // Starts fast and approaches slowly.
+    float QuadIn(float perc)
+    {
+        return ((-perc + 1.0f) * (perc - 1.0f)) + 1.0f;
+    }
+
+    // Starts slow, moves quickly through the center, and ends slow.
+    float QuadOutIn(float perc)
+    {
+        float lerp_param;
+        if(perc < 0.5)
+        {
+            perc *= 2.0f;
+            lerp_param = QuadOut(perc);
+            lerp_param /= 2.0f;
+        }
+        else
+        {
+            perc = perc - 0.5f;
+            perc *= 2.0f;
+            lerp_param = QuadIn(perc);
+            lerp_param = 0.5f + lerp_param / 2.0f;
+        }
+        return lerp_param;
+    }
+
     void PlayerTeleport()
     {
         // This should be exchanged for a quadratic in and out linear interpolation
@@ -64,7 +97,8 @@ public class Teleport : MonoBehaviour
         }
 
         float perc = 1.0f - (teleportTimeRemaining / teleportTime);
-        transform.position = startPosition + toDestination * perc; 
+        float lerp_param = QuadOutIn(perc);
+        transform.position = startPosition + toDestination * lerp_param; 
 
         // We need to create the particle effect around the teleporter.
         if(perc < 0.5f && !otherObjectTeleported)
@@ -91,10 +125,7 @@ public class Teleport : MonoBehaviour
         
         hit_occured = Physics.Raycast(hitscan_ray,
                                       out hit_information);
-
-        Vector3 start = position + right * rightEmissionOffset;
-        start -= up * downEmissionOffset;
-        Vector3 end;
+        Vector3 end_position;
 
         if(hit_occured)
         {
@@ -103,14 +134,18 @@ public class Teleport : MonoBehaviour
             {
                 StartTeleport(hit_object);
             }
-            end = hit_information.point;
+            end_position = hit_information.point;
         }
         else
         {
-            end = position + forward * 100.0f;
+            end_position = position + forward * 100.0f;
         }
         
-        Debug.DrawLine(start, end, Color.blue, 0.5f);
+        // Start drawing the teleport beam.
+        GameObject laserEffect = Instantiate(TeleportLaserEffect);
+        LaserEffect effect_comp = laserEffect.GetComponent<LaserEffect>();
+        Vector3 start_position = teleportBarrel.transform.position;
+        effect_comp.SetPositions(start_position, end_position);
     }
 
     void FixedUpdate () 

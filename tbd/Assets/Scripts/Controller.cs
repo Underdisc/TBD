@@ -92,8 +92,8 @@ public class Controller : MonoBehaviour
     void Start () 
     {
         ogQuat = transform.localRotation;
-        yRotation = transform.eulerAngles.y;
-        zRotation = transform.eulerAngles.z;
+        yRotation = 0.0f;
+        zRotation = 0.0f;
         respawnPosition = transform.position;
         
         // Set the keys used for movment detection.
@@ -304,9 +304,8 @@ public class Controller : MonoBehaviour
             GameObject ground_object = hit_information.collider.gameObject;
             if(ground_object.CompareTag("Bounce"))
             {
-                Vector3 bounceDirection = new Vector3(0.0f, 1.0f, 0.0f);
-                velocity = bounceSpeed * bounceDirection;
-                velocity = ScaleBackVector(velocity, maxBounceSpeed);
+                BouncePad bounce_pad = ground_object.GetComponent<BouncePad>();
+                velocity = bounce_pad.PerformBounce();
             }
             else
             {
