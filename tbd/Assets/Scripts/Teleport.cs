@@ -17,6 +17,10 @@ public class Teleport : MonoBehaviour
     public bool isPlayer = false;
     public int teleportButton = 0;
 
+    public float teleportFov;
+    private float fovRange;
+    private float initialFov;
+
 
     public float teleportTime = 0.1f;
     public GameObject TeleportLaserEffect;
@@ -98,10 +102,18 @@ public class Teleport : MonoBehaviour
 
         float perc = 1.0f - (teleportTimeRemaining / teleportTime);
         float lerp_param = QuadOutIn(perc);
-        transform.position = startPosition + toDestination * lerp_param; 
+        transform.position = startPosition + toDestination * lerp_param;
+
+        if(lerp_param > 0.5f)
+        {
+            lerp_param = 1.0f - lerp_param;
+        }
+        lerp_param = lerp_param / 0.5f;
+        float new_fov = initialFov + lerp_param * fovRange;
+        cameraCamera.fieldOfView = new_fov;
 
         // We need to create the particle effect around the teleporter.
-        if(perc < 0.5f && !otherObjectTeleported)
+        if(lerp_param > 0.5f && !otherObjectTeleported)
         {
             teleportObjectTransform.position = startPosition;
         }
@@ -176,6 +188,12 @@ public class Teleport : MonoBehaviour
             PlayerUpdate();
         }
         
+    }
+
+    void Start()
+    {
+        initialFov = cameraCamera.fieldOfView;
+        fovRange = teleportFov - initialFov;
     }
 }
 
