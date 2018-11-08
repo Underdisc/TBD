@@ -48,12 +48,57 @@
 				UNITY_TRANSFER_FOG(o,o.vertex);
 				return o;
 			}
+		
+
+			float random(float2 co)
+			{
+				float ret = sin(dot(co.xy ,float2(12.9898,78.233)));
+				ret = (ret * 43758.5453 + 1.0f) / 2.0f;
+				return ret;
+			}
+
+			float2 random(float2 min, float2 max, float2 seed)
+			{
+				float2 ret;
+				ret.x = min.x + random(seed) * (max.x - min.x);
+				ret.y = min.y + random(seed) * (max.y - min.y);
+				return ret;
+			}
+
+			float distance(float2 a, float2 b)
+			{
+				float2 d = a - b;
+				return sqrt(d.x * d.x + d.y * d.y);
+			}
 			
 			// Ok now I actually know what I am doing. woo
 			fixed4 frag (v2f i) : SV_Target
 			{
-				fixed4 col = tex2D(_MainTex, i.uv);
-				col = col * col * col * col;
+				float frequency = 3.0f;
+				float2 st = i.uv * frequency;
+				int2 st_i = (int2)st;
+		
+				float min_dist = 100000.0f;
+				for(int x = -1; x <= 1; ++x)
+				{
+					for(int y = -1; y <= 1; ++y)
+					{
+						int2 n_d = int2(x, y);
+						float2 n_min = float2(st_i + n_d);
+						float2 n_max = n_min + float2(1.0f, 1.0f);
+						float2 n = random(n_min, n_max, n_max);
+						float dist = distance(st, n);
+						if(dist < min_dist)
+						{
+							min_dist = dist;
+						}
+					}
+				}
+
+				//fixed4 col = tex2D(_MainTex, i.uv);
+				//col = col * col * col * col;
+				fixed4 col = fixed4(0.0f, 0.0f, 0.0f, 0.0f);
+				col += min_dist * 0.5;
 				return col;
 			}
 			ENDCG
