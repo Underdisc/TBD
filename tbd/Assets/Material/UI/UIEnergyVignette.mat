@@ -70,9 +70,9 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _UnscaledTime: 47.61718
+    - _UnscaledTime: 68.19829
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 0, b: 0.75977707, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _VignetteMinMax: {r: 1.4074261, g: 1.4351983, b: 0, a: 0}
+    - _VignetteMinMax: {r: 1.4896581, g: 1.4927607, b: 0, a: 0}

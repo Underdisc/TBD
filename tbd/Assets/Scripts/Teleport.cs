@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 // Tron amnesia
 
 // teleport will set time scale to zero
@@ -58,38 +57,6 @@ public class Teleport : MonoBehaviour
         //Time.timeScale = originalTimeScale;
     }
 
-    // Starts slowly and appproaches quickly.
-    float QuadOut(float perc)
-    {
-        return perc * perc;
-    }
-
-    // Starts fast and approaches slowly.
-    float QuadIn(float perc)
-    {
-        return ((-perc + 1.0f) * (perc - 1.0f)) + 1.0f;
-    }
-
-    // Starts slow, moves quickly through the center, and ends slow.
-    float QuadOutIn(float perc)
-    {
-        float lerp_param;
-        if(perc < 0.5)
-        {
-            perc *= 2.0f;
-            lerp_param = QuadOut(perc);
-            lerp_param /= 2.0f;
-        }
-        else
-        {
-            perc = perc - 0.5f;
-            perc *= 2.0f;
-            lerp_param = QuadIn(perc);
-            lerp_param = 0.5f + lerp_param / 2.0f;
-        }
-        return lerp_param;
-    }
-
     void PlayerTeleport()
     {
 
@@ -107,7 +74,7 @@ public class Teleport : MonoBehaviour
         {
             // l is our lerp parameter.
             float l = perc / 0.5f;
-            l = QuadOut(l);
+            l = Action.QuadOut(l);
             // Update the player's fov.
             float new_fov = initialFov + l * fovRange;
             cameraCamera.fieldOfView = new_fov;
@@ -116,7 +83,7 @@ public class Teleport : MonoBehaviour
         {
             // l is our lerp parameter.
             float l = (perc - 0.5f) / 0.5f;
-            l = QuadIn(l);
+            l = Action.QuadIn(l);
             // Update the player's position.
             Vector3 new_pos = startPosition + l * (endPosition - startPosition);
             this.transform.position = new_pos;
