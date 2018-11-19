@@ -49,8 +49,6 @@
                 float3 direction = i.modelPosition;
                 direction = normalize(direction);
 
-                
-
                 float voltage = sin(direction.y * 20 + _Time * 100);
                 float3 color = voltage * _Color.rgb;
                 c.rgb = color;

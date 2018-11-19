@@ -25,12 +25,14 @@ public class BulletTime : MonoBehaviour
         if(!inBulletTime)
         {
             Time.timeScale = bulletTimeScale;
-            Time.fixedDeltaTime = 0.02f * bulletTimeScale;
+            Time.fixedDeltaTime = bulletTimeScale * 0.02f;
+            uiObject.SendMessage("ActivateEnergyVignette");
         }
         else
         {
             Time.timeScale = 1.0f;
-            Time.fixedDeltaTime /= bulletTimeScale;
+            Time.fixedDeltaTime = 0.02f;
+            uiObject.SendMessage("DeactivateEnergyVignette");
         }
         inBulletTime = !inBulletTime;
     }

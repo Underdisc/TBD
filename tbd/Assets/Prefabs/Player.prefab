@@ -335,6 +335,8 @@ MonoBehaviour:
   rejectBarrel: {fileID: 1022018170207100}
   rejectLaserEffect: {fileID: 1876234172624246, guid: 0bb54686fc8fb164ca9eb52e16047f4b,
     type: 2}
+  rejectorPrefab: {fileID: 1101641595460486, guid: ad37d56d0a9cd594392d7887989c58f7,
+    type: 2}
 --- !u!114 &114396668476336860
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -354,7 +356,7 @@ MonoBehaviour:
   xSensitivity: 0.3
   zSensitivity: 0.3
   maxGroundSpeed: 10
-  groundAcceleration: 70
+  groundAcceleration: 100
   airAcceleration: 8
   gravityAcceleration: -15
   drag: 0
@@ -404,7 +406,8 @@ MonoBehaviour:
   cameraCamera: {fileID: 20538025589694112}
   isPlayer: 1
   teleportButton: 0
-  teleportTime: 0.4
+  teleportFov: 140
+  teleportTime: 0.5
   TeleportLaserEffect: {fileID: 1530921233024676, guid: 376fec43bc4c4cd429d57d435bbf1be3,
     type: 2}
   teleportBarrel: {fileID: 1198249552417274}

@@ -8,16 +8,18 @@ public class Reject : MonoBehaviour
     public Camera cameraCamera;
     public Rigidbody objectRigidbody;
     public float rejectVelocity;
-    public float rightEmissionOffset;
-    public float downEmissionOffset;
+    public float cooldownTime;
     public int rejectButton = 1;
 
     public GameObject rejectBarrel;
     public GameObject rejectLaserEffect;
+    public GameObject uiObject;
 
     public GameObject rejectorPrefab;
   
     private bool performReject = false;
+    private bool cooling = false;
+    private float cooldownTimePassed = 0.0f;
 
     public void RejectInDirection(Vector3 direction)
     {
@@ -30,6 +32,7 @@ public class Reject : MonoBehaviour
     void OnReject(RaycastHit hit_information, Vector3 direction)
     {
         RejectInDirection(direction);
+        uiObject.SendMessage("OnReject");
     }
 
     void TryRaycast()
@@ -71,12 +74,30 @@ public class Reject : MonoBehaviour
         if(performReject)
         {
             TryRaycast();
+            cooling = true;
             performReject = false;
         }
     }
   
     void Update () 
     {
+        if(cooling)
+        {
+            cooldownTimePassed += Time.unscaledDeltaTime;
+            float perc = cooldownTimePassed / cooldownTime;
+            uiObject.SendMessage("OnRejectUpdate", perc);
+            if(cooldownTimePassed > cooldownTime)
+            {
+                cooldownTimePassed = 0.0f;
+                cooling = false;
+                uiObject.SendMessage("OnRejectUpdate", 1.0);
+                // We should probably have an effect for when it is done.
+            }
+            else
+            {
+                return;
+            }
+        }
         if(Input.GetMouseButtonDown(rejectButton))
         {
             performReject = true;

@@ -8,6 +8,8 @@ using UnityEngine;
 
 public class Teleport : MonoBehaviour 
 {
+    public Rigidbody playerRigidbody;
+    private Vector3 playerVelocity;
 
     public float rightEmissionOffset;
     public float downEmissionOffset;
@@ -15,12 +17,11 @@ public class Teleport : MonoBehaviour
     public Transform cameraTransform;
     public Camera cameraCamera;
     public bool isPlayer = false;
-    public int teleportButton = 0;
+    public int teleportButton = 0;  
 
     public float teleportFov;
     private float fovRange;
     private float initialFov;
-
 
     public float teleportTime = 0.1f;
     public GameObject TeleportLaserEffect;
@@ -29,9 +30,9 @@ public class Teleport : MonoBehaviour
     private bool testTeleport = false;
     private bool performingTeleport = false;
     private float originalTimeScale;
-    private float teleportTimeRemaining;
+    private float teleportTimeElapsed;
     private Vector3 startPosition;
-    private Vector3 teleportDestination;
+    private Vector3 endPosition;
     private bool otherObjectTeleported = false;
     private Transform teleportObjectTransform;
 
@@ -40,18 +41,21 @@ public class Teleport : MonoBehaviour
     void StartTeleport(GameObject other)
     {
         performingTeleport = true;
-        originalTimeScale = Time.timeScale;
-        Time.timeScale = 0.0f;
-        teleportTimeRemaining = teleportTime;
+        playerVelocity = playerRigidbody.velocity;
+        playerRigidbody.velocity = new Vector3(0.0f, 0.0f, 0.0f);
+        //originalTimeScale = Time.timeScale;
+        //Time.timeScale = 0.0f;
+        teleportTimeElapsed = 0.0f;
         startPosition = transform.position;
         teleportObjectTransform = other.GetComponent<Transform>();
-        teleportDestination = teleportObjectTransform.position;
+        endPosition = teleportObjectTransform.position;
     }
 
     void EndTeleport()
     {
         performingTeleport = false;
-        Time.timeScale = originalTimeScale;
+        playerRigidbody.velocity = playerVelocity;
+        //Time.timeScale = originalTimeScale;
     }
 
     // Starts slowly and appproaches quickly.
@@ -88,32 +92,42 @@ public class Teleport : MonoBehaviour
 
     void PlayerTeleport()
     {
-        // This should be exchanged for a quadratic in and out linear interpolation
-        // function.
 
         // We need to spawn the effect as well.
-        Vector3 toDestination = teleportDestination - startPosition;
-        teleportTimeRemaining -= Time.unscaledDeltaTime;
-        if(teleportTimeRemaining <= 0.0f)
+        teleportTimeElapsed += Time.deltaTime;
+        if(teleportTimeElapsed >= teleportTime)
         {
-            teleportTimeRemaining = 0.0f;
             EndTeleport();
         }
 
-        float perc = 1.0f - (teleportTimeRemaining / teleportTime);
-        float lerp_param = QuadOutIn(perc);
-        transform.position = startPosition + toDestination * lerp_param;
+        float perc = teleportTimeElapsed / teleportTime;
 
-        if(lerp_param > 0.5f)
+        // Change fov when the lerp param is less than 0.5;
+        if(perc < 0.5f)
         {
-            lerp_param = 1.0f - lerp_param;
+            // l is our lerp parameter.
+            float l = perc / 0.5f;
+            l = QuadOut(l);
+            // Update the player's fov.
+            float new_fov = initialFov + l * fovRange;
+            cameraCamera.fieldOfView = new_fov;
         }
-        lerp_param = lerp_param / 0.5f;
-        float new_fov = initialFov + lerp_param * fovRange;
-        cameraCamera.fieldOfView = new_fov;
+        else
+        {
+            // l is our lerp parameter.
+            float l = (perc - 0.5f) / 0.5f;
+            l = QuadIn(l);
+            // Update the player's position.
+            Vector3 new_pos = startPosition + l * (endPosition - startPosition);
+            this.transform.position = new_pos;
+            // Update the player's fov.
+            float max_fov = initialFov + fovRange;
+            float new_fov = max_fov + l * (initialFov - max_fov);
+            cameraCamera.fieldOfView = new_fov;
+        }
 
-        // We need to create the particle effect around the teleporter.
-        if(lerp_param > 0.5f && !otherObjectTeleported)
+        // Telport the object to where the player started the teleportation.
+        if(perc > 0.5f && !otherObjectTeleported)
         {
             teleportObjectTransform.position = startPosition;
         }

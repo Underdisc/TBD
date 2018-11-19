@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Skybox
-  m_Shader: {fileID: 4800000, guid: 93691ee2257874845a8b31ffaa4a5c74, type: 3}
+  m_Name: UIEnergyRadialBar
+  m_Shader: {fileID: 4800000, guid: d1dca093a83923c4dafa85f1bf402743, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -55,6 +55,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - _BottomTopDistance: 0
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -62,17 +63,27 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _InsideOustideDistance: 0.05
+    - _InsideOutsideDistance: 0.05
     - _Metallic: 0
     - _Mode: 0
+    - _NoiseContribution: 1
+    - _NoiseFrequency: 2.14
+    - _NoiseSpeed: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _Percentage: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _UnscaledTime: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0, g: 0.68208313, b: 0.7924528, a: 1}
+    - _BarMinMax: {r: 0.85, g: 1, b: 0, a: 0}
+    - _BottomColor: {r: 0, g: 0.9582813, b: 1, a: 1}
+    - _Color: {r: 0, g: 0.8651767, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _VignetteMinMax: {r: 0.8, g: 1, b: 0, a: 0}
+    - _InsideColor: {r: 1, g: 0.15566039, b: 0.6824704, a: 1}
+    - _OutsideColor: {r: 0.47780252, g: 0, b: 0.5943396, a: 1}
+    - _RadianMinMax: {r: 3.2, g: 6.22, b: 0, a: 0}
+    - _TopColor: {r: 0, g: 0.47538614, b: 1, a: 1}
