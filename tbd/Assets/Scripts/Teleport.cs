@@ -7,89 +7,122 @@ using UnityEngine;
 
 public class Teleport : MonoBehaviour 
 {
+    // Player components.
     public Rigidbody playerRigidbody;
-    private Vector3 playerVelocity;
 
-    public float rightEmissionOffset;
-    public float downEmissionOffset;
-
+    // Camera obect and components.
+    public GameObject camera;
     public Transform cameraTransform;
     public Camera cameraCamera;
-    public bool isPlayer = false;
+
+    // Bash options.
+    public float bashEndSpeed;
+    public float bashTime;
+
+    // Teleport options.
+    public float teleportTime;
+    public float teleportMidpoint;
+    public float teleportFov;
+
+    // Teleport ability optins.
     public int teleportButton = 0;  
 
-    public float teleportFov;
+    // Effect prefabs.
+    public GameObject teleportLaserEffect;
+    public GameObject teleportEffectCube;
+
+    // The game object that holds the location where the teleport laser will
+    // be emitted from.
+    public GameObject teleportBarrel;
+
+    // Privates.
     private float fovRange;
     private float initialFov;
-
-    public float teleportTime = 0.1f;
-    public GameObject TeleportLaserEffect;
-
-    private bool usedTeleport = false;
+    private float bashStoredPlayerSpeed;
+    private float bashTimeElapsed;
     private bool testTeleport = false;
     private bool performingTeleport = false;
     private float originalTimeScale;
     private float teleportTimeElapsed;
+    private float timeInTeleport;
     private Vector3 startPosition;
     private Vector3 endPosition;
+    private Vector3 deltaPosition;
+    private Vector3 teleportDirection;
     private bool otherObjectTeleported = false;
     private Transform teleportObjectTransform;
+    private GameObject effectCube;
+    private Material effectCubeMaterial;
 
-    public GameObject teleportBarrel;
 
-    void StartTeleport(GameObject other)
-    {
-        performingTeleport = true;
-        playerVelocity = playerRigidbody.velocity;
-        playerRigidbody.velocity = new Vector3(0.0f, 0.0f, 0.0f);
-        //originalTimeScale = Time.timeScale;
-        //Time.timeScale = 0.0f;
-        teleportTimeElapsed = 0.0f;
-        startPosition = transform.position;
-        teleportObjectTransform = other.GetComponent<Transform>();
-        endPosition = teleportObjectTransform.position;
-    }
+    // The teleportStage delegate will be set depending on what stage of the
+    // teleport the player is on.
+    delegate void TeleportStageDelegate();
+    private TeleportStageDelegate teleportStage;
 
     void EndTeleport()
     {
         performingTeleport = false;
-        playerRigidbody.velocity = playerVelocity;
-        //Time.timeScale = originalTimeScale;
+        Vector3 center_p = new Vector3(0.5f, 0.5f, cameraTransform.position.z);
+        Ray ray = cameraCamera.ViewportPointToRay(center_p);
+        float player_speed = bashEndSpeed + bashStoredPlayerSpeed;
+        playerRigidbody.velocity = ray.direction * (bashEndSpeed);
+        Time.timeScale = originalTimeScale;
+        Destroy(effectCube);
     }
 
-    void PlayerTeleport()
+    void TeleportStage1()
     {
-
-        // We need to spawn the effect as well.
-        teleportTimeElapsed += Time.deltaTime;
-        if(teleportTimeElapsed >= teleportTime)
+        bashTimeElapsed += Time.unscaledDeltaTime;
+        if(bashTimeElapsed >= bashTime || 
+           Input.GetMouseButtonDown(teleportButton))
         {
             EndTeleport();
+        }
+    }
+
+    void TeleportTransitionStage0Stage1()
+    {
+        teleportStage = TeleportStage1;
+        this.transform.position = endPosition;
+        bashTimeElapsed = 0.0f;
+    }
+
+    void TeleportStage0()
+    {
+        teleportTimeElapsed += Time.unscaledDeltaTime;
+        if(teleportTimeElapsed >= teleportTime)
+        {
+            TeleportTransitionStage0Stage1();
         }
 
         float perc = teleportTimeElapsed / teleportTime;
 
         // Change fov when the lerp param is less than 0.5;
-        if(perc < 0.5f)
+        if(perc < teleportMidpoint)
         {
             // l is our lerp parameter.
-            float l = perc / 0.5f;
-            l = Action.QuadOut(l);
+            float lp = perc / teleportMidpoint;
+            float lp_quadout = Action.QuadOut(lp);
+            float lp_quadin = Action.QuadIn(lp);
             // Update the player's fov.
-            float new_fov = initialFov + l * fovRange;
+            float new_fov = initialFov + lp_quadout * fovRange;
             cameraCamera.fieldOfView = new_fov;
+            // Update the material
+            float new_contain_min = 0.5f - lp_quadin * 0.30f;
+            effectCubeMaterial.SetFloat("_ContainMin", new_contain_min);
         }
         else
         {
-            // l is our lerp parameter.
-            float l = (perc - 0.5f) / 0.5f;
-            l = Action.QuadIn(l);
+            // lp is our lerp parameter.
+            float lp = (perc - teleportMidpoint) / (1.0f - teleportMidpoint);
+            lp = Action.QuadIn(lp);
             // Update the player's position.
-            Vector3 new_pos = startPosition + l * (endPosition - startPosition);
+            Vector3 new_pos = startPosition + lp * deltaPosition;
             this.transform.position = new_pos;
             // Update the player's fov.
             float max_fov = initialFov + fovRange;
-            float new_fov = max_fov + l * (initialFov - max_fov);
+            float new_fov = max_fov + lp * (initialFov - max_fov);
             cameraCamera.fieldOfView = new_fov;
         }
 
@@ -99,6 +132,51 @@ public class Teleport : MonoBehaviour
             teleportObjectTransform.position = startPosition;
         }
 
+    }
+
+    void teleportGeneral()
+    {
+        timeInTeleport += Time.unscaledDeltaTime;
+        effectCubeMaterial.SetFloat("_CurrentTime", timeInTeleport);
+    }
+
+    void PlayerTeleport()
+    {
+        teleportStage();
+        teleportGeneral();
+    }
+
+    void StartTeleport(GameObject other)
+    {
+        performingTeleport = true;
+        bashStoredPlayerSpeed = playerRigidbody.velocity.magnitude;
+        playerRigidbody.velocity = new Vector3(0.0f, 0.0f, 0.0f);
+        originalTimeScale = Time.timeScale;
+        Time.timeScale = 0.0f;
+        teleportTimeElapsed = 0.0f;
+        timeInTeleport = 0.0f;
+        startPosition = transform.position;
+        teleportObjectTransform = other.GetComponent<Transform>();
+        endPosition = teleportObjectTransform.position;
+        deltaPosition = endPosition - startPosition;
+        teleportDirection = deltaPosition.normalized;
+        teleportStage = TeleportStage0;
+
+        // Create the teleport effect cube.
+        effectCube = Instantiate(teleportEffectCube);
+        Attach attach_comp = effectCube.GetComponent<Attach>();
+        attach_comp.attachedToObject = camera;
+        // Set the forward direction on the effect cube to indicate the
+        // direction that the player is teleporting.
+        MeshRenderer mesh_comp = effectCube.GetComponent<MeshRenderer>();
+        effectCubeMaterial = mesh_comp.material;
+        Vector4 material_forward = new Vector4(teleportDirection.x,
+                                               teleportDirection.y,
+                                               teleportDirection.z,
+                                               0.0f);
+        effectCubeMaterial.SetVector("_Forward", material_forward);
+        // Begin the teleport sequence with the first teleport call.
+        PlayerTeleport();
     }
     
     void TryTeleport()
@@ -135,7 +213,7 @@ public class Teleport : MonoBehaviour
         }
         
         // Start drawing the teleport beam.
-        GameObject laserEffect = Instantiate(TeleportLaserEffect);
+        GameObject laserEffect = Instantiate(teleportLaserEffect);
         LaserEffect effect_comp = laserEffect.GetComponent<LaserEffect>();
         Vector3 start_position = teleportBarrel.transform.position;
         effect_comp.SetPositions(start_position, end_position);
@@ -145,13 +223,16 @@ public class Teleport : MonoBehaviour
     {
         if(testTeleport)
         {
+            // Check to see if the player's teleport request is valid.
             TryTeleport();
             testTeleport = false;
         }
     }
 
-    void PlayerUpdate()
+    void CheckTeleportRequest()
     {
+        // If the player attempts to teleport, whether a teleport occurs or not
+        // will be checked for during the fixed update.
         if(Input.GetMouseButtonDown(teleportButton))
         {
             testTeleport = true;
@@ -160,19 +241,22 @@ public class Teleport : MonoBehaviour
 
     void Update()
     {
+        // If the player is in the middle of a teleport, continue performing the
+        // teleport. If not, check for a teleport request.
         if(performingTeleport)
         {
             PlayerTeleport();
         }
         else
         {
-            PlayerUpdate();
+            CheckTeleportRequest();
         }
         
     }
 
     void Start()
     {
+        // Set the needed initial values for the teleport script.
         initialFov = cameraCamera.fieldOfView;
         fovRange = teleportFov - initialFov;
     }

@@ -1,6 +1,43 @@
 ﻿
 static const float PI =  3.14159265358979323;
 static const float TAU = 6.28318530717958647;
+static const float EPSILON_5 = 0.00001;
+
+float eq(float a, float b)
+{
+	return 1.0 - abs(sign(a - b));
+}
+
+float neq(float a, float b)
+{
+	return abs(sign(a - b));
+}
+
+float gt(float a, float b)
+{
+	return max(sign(a - b), 0.0);
+}
+
+float lt(float a, float b)
+{
+	return max(sign(b - a), 0.0);
+}
+
+float gteq(float a, float b)
+{
+	return max(eq(a, b), gt(a, b));
+}
+
+float lteq(float a, float b)
+{
+	return max(eq(a, b), lt(a, b));
+}
+
+float invert(float value, float min, float max)
+{
+	float max_dist = max - value;
+	return min + max_dist;
+}
 
 float random(float2 st)
 {
@@ -33,6 +70,22 @@ float2 unit_vector(float2 vec)
 {
 	float len = length(vec);
 	return vec * (1.0 / len);
+}
+
+float gradient(float minimum, float maximum, float p)
+{
+	float delta = maximum - minimum;
+	float p_delta = p - minimum;
+	float gradient = gt(p, minimum);
+	gradient = min(gradient * p_delta / delta, 1.0);
+	return gradient;
+}
+
+float apply_gradient(float grad, float v)
+{
+	float applied = gt(grad, 0.0) * v * grad;
+	applied = min(applied + grad, 1.0);
+	return applied;
 }
 
 float noise(float2 st)
@@ -68,4 +121,9 @@ float vignette(float2 uv, float s_g, float e_g)
 	float dist = e_g - s_g;
 	float ret = (len - s_g) / dist;
 	return ret;
+}
+
+float toon(float value, float toon_factor)
+{
+	return floor(value * toon_factor) / toon_factor;
 }
