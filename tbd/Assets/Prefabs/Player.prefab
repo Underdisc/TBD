@@ -190,7 +190,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 102
+  field of view: 120.2
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -329,12 +329,12 @@ MonoBehaviour:
   cameraCamera: {fileID: 20538025589694112}
   objectRigidbody: {fileID: 54691481887123886}
   rejectVelocity: 16.17
-  rightEmissionOffset: 1
-  downEmissionOffset: 0.5
+  cooldownTime: 2
   rejectButton: 1
   rejectBarrel: {fileID: 1022018170207100}
   rejectLaserEffect: {fileID: 1876234172624246, guid: 0bb54686fc8fb164ca9eb52e16047f4b,
     type: 2}
+  uiObject: {fileID: 0}
   rejectorPrefab: {fileID: 1101641595460486, guid: ad37d56d0a9cd594392d7887989c58f7,
     type: 2}
 --- !u!114 &114396668476336860
@@ -356,8 +356,8 @@ MonoBehaviour:
   xSensitivity: 0.3
   zSensitivity: 0.3
   maxGroundSpeed: 10
-  groundAcceleration: 100
-  airAcceleration: 8
+  groundAcceleration: 150
+  airAcceleration: 10
   gravityAcceleration: -15
   drag: 0
 --- !u!114 &114435090978244916
@@ -400,15 +400,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b87d87becf44984487a038f61a49b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rightEmissionOffset: 1
-  downEmissionOffset: 0.5
+  playerRigidbody: {fileID: 54691481887123886}
+  camera: {fileID: 1918152130175854}
   cameraTransform: {fileID: 4721298652206848}
   cameraCamera: {fileID: 20538025589694112}
-  isPlayer: 1
-  teleportButton: 0
+  bashEndSpeed: 10
+  bashTime: 5
+  teleportTime: 1
+  teleportMidpoint: 0.3
   teleportFov: 140
-  teleportTime: 0.5
-  TeleportLaserEffect: {fileID: 1530921233024676, guid: 376fec43bc4c4cd429d57d435bbf1be3,
+  teleportEffectFoldStart: 0.4
+  teleportEffectFoldEnd: 0.15
+  teleportEffectDissolveTime: 0.1
+  teleportButton: 0
+  teleportLaserEffect: {fileID: 1530921233024676, guid: 376fec43bc4c4cd429d57d435bbf1be3,
+    type: 2}
+  teleportEffectCube: {fileID: 1003632111876020, guid: 5dece4af985acb843bf85108f84544c4,
     type: 2}
   teleportBarrel: {fileID: 1198249552417274}
 --- !u!136 &136797678966580844

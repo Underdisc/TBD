@@ -4169,81 +4169,20 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114029532934855606, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
+        type: 2}
+      propertyPath: uiObject
+      value: 
+      objectReference: {fileID: 601878824}
     - target: {fileID: 114435090978244916, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
         type: 2}
       propertyPath: uiObject
       value: 
       objectReference: {fileID: 601878824}
-    - target: {fileID: 114396668476336860, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: groundAcceleration
-      value: 150
-      objectReference: {fileID: 0}
-    - target: {fileID: 114396668476336860, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: airAcceleration
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
         type: 2}
-      propertyPath: teleportFov
-      value: 140.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 114029532934855606, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: cooldownTime
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114029532934855606, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: uiObject
-      value: 
-      objectReference: {fileID: 601878824}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: playerRigidbody
-      value: 
-      objectReference: {fileID: 1008872823}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: teleportTime
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4729039324969320, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
-      objectReference: {fileID: 0}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: bashTime
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: bashEndSpeed
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: teleportLaserEffect
-      value: 
-      objectReference: {fileID: 1530921233024676, guid: 376fec43bc4c4cd429d57d435bbf1be3,
-        type: 2}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: teleportEffectCube
-      value: 
-      objectReference: {fileID: 1003632111876020, guid: 5dece4af985acb843bf85108f84544c4,
-        type: 2}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: camera
-      value: 
-      objectReference: {fileID: 961759449}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: teleportMidpoint
-      value: 0.4
+      propertyPath: teleportEffectDissolveTime
+      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9, type: 2}
@@ -8743,21 +8682,11 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86a2e0056dd06a044851090d8ecd2124, type: 2}
   m_IsPrefabAsset: 0
---- !u!1 &961759449 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1918152130175854, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-    type: 2}
-  m_PrefabInternal: {fileID: 500163392}
 --- !u!4 &989778484 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4872647073211010, guid: 86a2e0056dd06a044851090d8ecd2124,
     type: 2}
   m_PrefabInternal: {fileID: 927960549}
---- !u!54 &1008872823 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 54691481887123886, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-    type: 2}
-  m_PrefabInternal: {fileID: 500163392}
 --- !u!43 &1012549727
 Mesh:
   m_ObjectHideFlags: 0

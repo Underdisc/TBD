@@ -15,6 +15,10 @@
 		_NoiseSpeed("Noise Speed", Float) = 1.0
 		_ContainGradientMin("Contain Gradient: Min", Range(0.0, 1.0)) = 0.25
 		_ContainGradientMax("Contain Gradient: Max", Range(0.0, 1.0)) = 0.75
+		_ToonLevel("Toon Level", Int) = 4
+		_DissolvePercentage("Dissolve Percentage", Range(0.0, 1.0)) = 0.5
+		_DissolveFrequencyForward("Dissolve Frequency: Forward", Float) = 1.0
+		_DissolveFrequencyRight("Dissolve Frequency: Right", Float) = 1.0
 		_CurrentTime("Current Time", Float) = 0.0
 	}
 	SubShader
@@ -63,6 +67,10 @@
 			float _NoiseSpeed;
 			float _ContainGradientMin;
 			float _ContainGradientMax;
+			float _ToonLevel;
+			float _DissolvePercentage;
+			float _DissolveFrequencyForward;
+			float _DissolveFrequencyRight;
 			float _CurrentTime;
 
 
@@ -130,12 +138,21 @@
 
 				float gradient_forward = gradient(g_min, g_max, perc_forward);
 				float grayscale = apply_gradient(gradient_forward, perc_noise);
-				grayscale = toon(grayscale, 4.0);
+				grayscale = toon(grayscale, _ToonLevel);
 				grayscale = invert(grayscale, 0.0, 1.0);
 				float4 color = grayscale * _CombColor;
 
+				noise_perc_forward = perc_forward * _DissolveFrequencyForward;
+				noise_perc_right = perc_right_full * _DissolveFrequencyRight;
+				noise_perc_vec = float2(noise_perc_forward, noise_perc_right);
+				perc_noise = noise(noise_perc_vec);
+				perc_noise = clamp(pow(2.0, perc_noise) - 1.0, 0.0, 1.0);
+				float dissolve = lt(_DissolvePercentage, perc_noise);
+
 				// Store the transparency value of this fragment.
-				float transparency = gt(perc_forward, c_min) * lt(perc_forward, c_max);
+				float transparency = gt(perc_forward, c_min);
+				transparency *= lt(perc_forward, c_max);
+				transparency *= dissolve;
 				fixed4 final_fragment = float4(color.xyz, transparency);
 				return final_fragment;
 			}

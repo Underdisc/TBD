@@ -997,52 +997,7 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 114435090978244916, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: uiObject
-      value: 
-      objectReference: {fileID: 601878824}
-    - target: {fileID: 114396668476336860, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: groundAcceleration
-      value: 150
-      objectReference: {fileID: 0}
-    - target: {fileID: 114396668476336860, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: airAcceleration
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: teleportFov
-      value: 160
-      objectReference: {fileID: 0}
-    - target: {fileID: 114029532934855606, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: cooldownTime
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114029532934855606, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: uiObject
-      value: 
-      objectReference: {fileID: 601878824}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: playerRigidbody
-      value: 
-      objectReference: {fileID: 1008872823}
-    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-        type: 2}
-      propertyPath: teleportTime
-      value: 0.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 4729039324969320, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -90
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 114796897816924330, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9, type: 2}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9, type: 2}
   m_IsPrefabAsset: 0
 --- !u!4 &527542120 stripped
@@ -2005,11 +1960,6 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d80b03cdde9ca3c4abbb5a5f1567420a, type: 2}
   m_IsPrefabAsset: 0
---- !u!54 &1008872823 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 54691481887123886, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
-    type: 2}
-  m_PrefabInternal: {fileID: 500163392}
 --- !u!1 &1009677817
 GameObject:
   m_ObjectHideFlags: 0

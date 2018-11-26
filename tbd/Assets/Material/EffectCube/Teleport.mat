@@ -12,7 +12,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -56,15 +56,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _CombDepth: 0.052
+    - _CombDepth: 0.042
     - _CombFrequency: 12
-    - _ContainGradientMax: 0.762
-    - _ContainGradientMin: 0.218
+    - _ContainGradientMax: 0.77
+    - _ContainGradientMin: 0.123
     - _ContainMax: 1
-    - _ContainMin: 0.245
+    - _ContainMin: 0.15
     - _CurrentTime: 0
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
+    - _DissolveFrequencyForward: 53.4
+    - _DissolveFrequencyRight: 71.2
+    - _DissolvePercentage: 0
     - _DstBlend: 10
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -79,6 +82,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _ToonLevel: 4
     - _UVSec: 0
     - _ZWrite: 0
     m_Colors:

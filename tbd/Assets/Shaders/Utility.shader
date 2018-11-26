@@ -123,7 +123,7 @@ float vignette(float2 uv, float s_g, float e_g)
 	return ret;
 }
 
-float toon(float value, float toon_factor)
+float toon(float value, int toon_factor)
 {
 	return floor(value * toon_factor) / toon_factor;
 }

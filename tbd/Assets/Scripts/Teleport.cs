@@ -23,6 +23,9 @@ public class Teleport : MonoBehaviour
     public float teleportTime;
     public float teleportMidpoint;
     public float teleportFov;
+    public float teleportEffectFoldStart;
+    public float teleportEffectFoldEnd;
+    public float teleportEffectDissolveTime;
 
     // Teleport ability optins.
     public int teleportButton = 0;  
@@ -49,6 +52,9 @@ public class Teleport : MonoBehaviour
     private Vector3 endPosition;
     private Vector3 deltaPosition;
     private Vector3 teleportDirection;
+    private float teleportEffectFoldDelta;
+    private bool teleportEffectDissolving = false;
+    private float teleportEffectDissolveTimeElapsed;
     private bool otherObjectTeleported = false;
     private Transform teleportObjectTransform;
     private GameObject effectCube;
@@ -86,6 +92,8 @@ public class Teleport : MonoBehaviour
         teleportStage = TeleportStage1;
         this.transform.position = endPosition;
         bashTimeElapsed = 0.0f;
+        teleportEffectDissolveTimeElapsed = 0.0f;
+        teleportEffectDissolving = true;
     }
 
     void TeleportStage0()
@@ -109,8 +117,9 @@ public class Teleport : MonoBehaviour
             float new_fov = initialFov + lp_quadout * fovRange;
             cameraCamera.fieldOfView = new_fov;
             // Update the material
-            float new_contain_min = 0.5f - lp_quadin * 0.30f;
-            effectCubeMaterial.SetFloat("_ContainMin", new_contain_min);
+            float contain_min = teleportEffectFoldStart +
+                                lp_quadout * teleportEffectFoldDelta;
+            effectCubeMaterial.SetFloat("_ContainMin", contain_min);
         }
         else
         {
@@ -127,7 +136,7 @@ public class Teleport : MonoBehaviour
         }
 
         // Telport the object to where the player started the teleportation.
-        if(perc > 0.5f && !otherObjectTeleported)
+        if(perc > teleportMidpoint && !otherObjectTeleported)
         {
             teleportObjectTransform.position = startPosition;
         }
@@ -175,8 +184,24 @@ public class Teleport : MonoBehaviour
                                                teleportDirection.z,
                                                0.0f);
         effectCubeMaterial.SetVector("_Forward", material_forward);
+        // Make sure all of the effect cube is visible.
+        effectCubeMaterial.SetFloat("_DissolvePercentage", 0.0f);
         // Begin the teleport sequence with the first teleport call.
         PlayerTeleport();
+    }
+
+    void DissolveTeleportEffect()
+    {
+        teleportEffectDissolveTimeElapsed += Time.unscaledDeltaTime;
+        if(teleportEffectDissolveTimeElapsed > teleportEffectDissolveTime)
+        {
+            Destroy(effectCube);
+            teleportEffectDissolving = false;
+        }
+        float elapsed = teleportEffectDissolveTimeElapsed;
+        float total = teleportEffectDissolveTime;
+        float dissolve_perc = elapsed / total;
+        effectCubeMaterial.SetFloat("_DissolvePercentage", dissolve_perc);
     }
     
     void TryTeleport()
@@ -251,6 +276,12 @@ public class Teleport : MonoBehaviour
         {
             CheckTeleportRequest();
         }
+
+        // Dissolve the teleport affect.
+        if(teleportEffectDissolving)
+        {
+            DissolveTeleportEffect();
+        }
         
     }
 
@@ -259,6 +290,8 @@ public class Teleport : MonoBehaviour
         // Set the needed initial values for the teleport script.
         initialFov = cameraCamera.fieldOfView;
         fovRange = teleportFov - initialFov;
+        teleportEffectFoldDelta = teleportEffectFoldEnd - 
+                                  teleportEffectFoldStart;
     }
 }
 
