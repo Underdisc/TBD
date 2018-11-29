@@ -136,11 +136,12 @@ public class Teleport : MonoBehaviour
         }
 
         // Telport the object to where the player started the teleportation.
-        if(perc > teleportMidpoint && !otherObjectTeleported)
-        {
-            teleportObjectTransform.position = startPosition;
-        }
-
+        // if(perc > teleportMidpoint && !otherObjectTeleported)
+        // {
+        //     teleportObjectTransform.position = startPosition;
+        // } 
+        //*Dylan Note: disabled for having fixed position teleporters
+        // Setting collider to trigger to avoid collision with player
     }
 
     void teleportGeneral()
