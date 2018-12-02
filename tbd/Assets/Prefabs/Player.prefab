@@ -92,6 +92,7 @@ GameObject:
   - component: {fileID: 20538025589694112}
   - component: {fileID: 81929997765128400}
   - component: {fileID: 114796897816924330}
+  - component: {fileID: 114107890531442722}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -147,7 +148,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1918152130175854}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: -0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4729039324969320}
@@ -190,7 +191,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 120.2
+  field of view: 90
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -337,6 +338,21 @@ MonoBehaviour:
   uiObject: {fileID: 0}
   rejectorPrefab: {fileID: 1101641595460486, guid: ad37d56d0a9cd594392d7887989c58f7,
     type: 2}
+--- !u!114 &114107890531442722
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1918152130175854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93b1fc08e480a6448a312893892fe2aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _object_transform: {fileID: 4721298652206848}
+  _height: 0.05
+  _max: 0.1
+  _period: 0.5
 --- !u!114 &114396668476336860
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -350,6 +366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transform: {fileID: 4729039324969320}
   rigidbody: {fileID: 54691481887123886}
+  headBob: {fileID: 114107890531442722}
   bounceSpeed: 15
   maxBounceSpeed: 15
   height: 1.5
@@ -404,20 +421,25 @@ MonoBehaviour:
   camera: {fileID: 1918152130175854}
   cameraTransform: {fileID: 4721298652206848}
   cameraCamera: {fileID: 20538025589694112}
-  bashEndSpeed: 10
+  bashEndSpeed: 5
   bashTime: 5
-  teleportTime: 1
+  teleportTime: 5
   teleportMidpoint: 0.3
   teleportFov: 140
   teleportEffectFoldStart: 0.4
   teleportEffectFoldEnd: 0.15
   teleportEffectDissolveTime: 0.1
   teleportButton: 0
+  radius: 0.18
   teleportLaserEffect: {fileID: 1530921233024676, guid: 376fec43bc4c4cd429d57d435bbf1be3,
     type: 2}
   teleportEffectCube: {fileID: 1003632111876020, guid: 5dece4af985acb843bf85108f84544c4,
     type: 2}
   teleportBarrel: {fileID: 1198249552417274}
+  tracker: {fileID: 0}
+  UIReticle: {fileID: 0}
+  teleportColliderPrefab: {fileID: 1399586025577880, guid: 0d3f913b49839aa449cc61883a4b13b4,
+    type: 2}
 --- !u!136 &136797678966580844
 CapsuleCollider:
   m_ObjectHideFlags: 1

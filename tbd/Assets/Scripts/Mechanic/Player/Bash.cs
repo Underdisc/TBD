@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 // Tron amnesia
 
 // teleport will set time scale to zero
 
-public class Teleport : MonoBehaviour 
+public class Bash : MonoBehaviour 
 {
     // Player components.
     public Rigidbody playerRigidbody;
@@ -28,7 +29,8 @@ public class Teleport : MonoBehaviour
     public float teleportEffectDissolveTime;
 
     // Teleport ability optins.
-    public int teleportButton = 0;  
+    public int teleportButton = 0; 
+    public float radius;
 
     // Effect prefabs.
     public GameObject teleportLaserEffect;
@@ -38,7 +40,14 @@ public class Teleport : MonoBehaviour
     // be emitted from.
     public GameObject teleportBarrel;
 
-    // Privates.
+    public TeleporterTracker tracker;
+
+    public GameObject UIReticle;
+
+    public GameObject teleportColliderPrefab;
+
+
+    // Private Section
     private float fovRange;
     private float initialFov;
     private float bashStoredPlayerSpeed;
@@ -56,14 +65,15 @@ public class Teleport : MonoBehaviour
     private bool teleportEffectDissolving = false;
     private float teleportEffectDissolveTimeElapsed;
     private bool otherObjectTeleported = false;
-    private Transform teleportObjectTransform;
     private GameObject effectCube;
     private Material effectCubeMaterial;
-
+    private Material reticleMaterial;
+    private Teleporter teleporter;
+    private GameObject teleportCollider;
 
     // The teleportStage delegate will be set depending on what stage of the
     // teleport the player is on.
-    delegate void TeleportStageDelegate();
+    private delegate void TeleportStageDelegate();
     private TeleportStageDelegate teleportStage;
 
     void EndTeleport()
@@ -71,10 +81,15 @@ public class Teleport : MonoBehaviour
         performingTeleport = false;
         Vector3 center_p = new Vector3(0.5f, 0.5f, cameraTransform.position.z);
         Ray ray = cameraCamera.ViewportPointToRay(center_p);
-        float player_speed = bashEndSpeed + bashStoredPlayerSpeed;
-        playerRigidbody.velocity = ray.direction * (bashEndSpeed);
+        float player_speed = bashEndSpeed;
+        Vector3 direction = ray.direction.normalized * player_speed;
+        playerRigidbody.velocity = direction * (bashEndSpeed);
         Time.timeScale = originalTimeScale;
         Destroy(effectCube);
+        Destroy(teleportCollider);
+
+        // Tell the telelporter that the player has performed their bash.
+        teleporter.OnBash();
     }
 
     void TeleportStage1()
@@ -134,14 +149,6 @@ public class Teleport : MonoBehaviour
             float new_fov = max_fov + lp * (initialFov - max_fov);
             cameraCamera.fieldOfView = new_fov;
         }
-
-        // Telport the object to where the player started the teleportation.
-        // if(perc > teleportMidpoint && !otherObjectTeleported)
-        // {
-        //     teleportObjectTransform.position = startPosition;
-        // } 
-        //*Dylan Note: disabled for having fixed position teleporters
-        // Setting collider to trigger to avoid collision with player
     }
 
     void teleportGeneral()
@@ -166,11 +173,16 @@ public class Teleport : MonoBehaviour
         teleportTimeElapsed = 0.0f;
         timeInTeleport = 0.0f;
         startPosition = transform.position;
-        teleportObjectTransform = other.GetComponent<Transform>();
+        Transform teleportObjectTransform = other.GetComponent<Transform>();
         endPosition = teleportObjectTransform.position;
         deltaPosition = endPosition - startPosition;
         teleportDirection = deltaPosition.normalized;
         teleportStage = TeleportStage0;
+
+        // Notify the Teleporter that the player is beginning the teleport
+        // sequence.
+        teleporter = other.GetComponent<Teleporter>();
+        teleporter.OnTeleport(teleportTime);
 
         // Create the teleport effect cube.
         effectCube = Instantiate(teleportEffectCube);
@@ -187,6 +199,20 @@ public class Teleport : MonoBehaviour
         effectCubeMaterial.SetVector("_Forward", material_forward);
         // Make sure all of the effect cube is visible.
         effectCubeMaterial.SetFloat("_DissolvePercentage", 0.0f);
+
+        // Create the telelport collider to see if the player collides with any
+        // beacons.
+        teleportCollider = Instantiate(teleportColliderPrefab);
+        Vector3 collider_position = startPosition + deltaPosition / 2.0f;
+        teleportCollider.transform.position = collider_position;
+        float collider_length = deltaPosition.magnitude;
+        Vector3 scale = teleportCollider.transform.localScale;
+        scale.z = collider_length;
+        teleportCollider.transform.localScale = scale;
+        Quaternion rotation = Quaternion.LookRotation(deltaPosition);
+        teleportCollider.transform.rotation = rotation;
+        Collider collider = teleportCollider.GetComponent<Collider>();
+
         // Begin the teleport sequence with the first teleport call.
         PlayerTeleport();
     }
@@ -207,42 +233,13 @@ public class Teleport : MonoBehaviour
     
     void TryTeleport()
     {
-        bool hit_occured;
-        RaycastHit hit_information;
-        Vector3 position = cameraTransform.position;
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
-        Vector3 up = cameraTransform.up;
-
-        int layer_mask = 1 << 8;
-        layer_mask = ~layer_mask;
-
-        Vector3 center = new Vector3(0.5f, 0.5f, cameraTransform.position.z);
-        Ray hitscan_ray = cameraCamera.ViewportPointToRay(center);
-        
-        hit_occured = Physics.Raycast(hitscan_ray,
-                                      out hit_information);
-        Vector3 end_position;
-
-        if(hit_occured)
+        GameObject best_teleporter = tracker.ChooseBestTeleporter(radius);
+        reticleMaterial.SetFloat("_ContainMax", radius);
+        if(best_teleporter == null)
         {
-            GameObject hit_object = hit_information.collider.gameObject;
-            if(hit_object.CompareTag("Teleporter"))
-            {
-                StartTeleport(hit_object);
-            }
-            end_position = hit_information.point;
+            return;
         }
-        else
-        {
-            end_position = position + forward * 100.0f;
-        }
-        
-        // Start drawing the teleport beam.
-        GameObject laserEffect = Instantiate(teleportLaserEffect);
-        LaserEffect effect_comp = laserEffect.GetComponent<LaserEffect>();
-        Vector3 start_position = teleportBarrel.transform.position;
-        effect_comp.SetPositions(start_position, end_position);
+        StartTeleport(best_teleporter);
     }
 
     void FixedUpdate () 
@@ -293,6 +290,8 @@ public class Teleport : MonoBehaviour
         fovRange = teleportFov - initialFov;
         teleportEffectFoldDelta = teleportEffectFoldEnd - 
                                   teleportEffectFoldStart;
+        Image image_comp = UIReticle.GetComponent<Image>();
+        reticleMaterial = image_comp.material;
     }
 }
 

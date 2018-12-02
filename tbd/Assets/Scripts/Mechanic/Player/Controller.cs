@@ -57,7 +57,7 @@ public class Controller : MonoBehaviour
 
     public Transform transform;
     public Rigidbody rigidbody;
-    //public HeadBob headBob;
+    public HeadBob headBob;
 
     // Should be seperated from the controller
     public float bounceSpeed;
@@ -326,9 +326,9 @@ public class Controller : MonoBehaviour
                 }
                 else
                 {
-                head_bob_contribution = speed / maxGroundSpeed;
+                    head_bob_contribution = speed / maxGroundSpeed;
                 }
-                //headBob.UpdateContribution(head_bob_contribution);
+                headBob.UpdateContribution(head_bob_contribution);
             }
         }
         else
@@ -336,7 +336,7 @@ public class Controller : MonoBehaviour
             velocity = AirMovement(velocity, forward_heading, left_heading);
 
             // Do not perform head bobbing while flying through the air.
-            //headBob.UpdateContribution(0.0f);
+            headBob.UpdateContribution(0.0f);
         }
         
         // Reset the velocity of the rigidody for the next physics updat.

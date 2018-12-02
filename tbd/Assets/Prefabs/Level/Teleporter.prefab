@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 33032324256581090}
   - component: {fileID: 23518111590753976}
   - component: {fileID: 135297328575160830}
+  - component: {fileID: 114090810010929252}
   m_Layer: 0
   m_Name: Teleporter
   m_TagString: Teleporter
@@ -84,6 +85,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1006345200873604}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &114090810010929252
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1006345200873604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2d4ceeabca422044bbc3ee380f03d40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  reappearTime: 0.5
 --- !u!135 &135297328575160830
 SphereCollider:
   m_ObjectHideFlags: 1

@@ -43,7 +43,7 @@ public class HeadBob : MonoBehaviour
         _og_position = _object_transform.localPosition;
         _direction = 1.0f;
         _prev_input = -_max;
-        _contribution = 0.0f;
+        _contribution = 1.0f;
 
         // Omega must go from -_max to _max and back over the amount of time
         // specified by the _period.

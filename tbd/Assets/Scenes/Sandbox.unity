@@ -4184,6 +4184,11 @@ Prefab:
       propertyPath: teleportEffectDissolveTime
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 114969065130365088, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9,
+        type: 2}
+      propertyPath: teleportTime
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2f3ef7d4c07bbd4db8eddb4bbd209c9, type: 2}
   m_IsPrefabAsset: 0
