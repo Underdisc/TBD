@@ -62,7 +62,7 @@ public class TimerLogic : MonoBehaviour {
 
 		//TimerText.text = string.Concat(hr, ":", min, ".", sec, ".", mil, " ms");
 		TimerText.text = string.Concat(hr, ":", min, ".", sec);
-		MilliText.text = string.Concat(mil, " ms");
+		MilliText.text = string.Concat(". ", mil, " ms");
 	}
 	void StartTimer()
 	{
