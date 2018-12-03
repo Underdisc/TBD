@@ -6,6 +6,7 @@ using UnityEngine;
 public class Beacon_Logic : MonoBehaviour {
 
 	[SerializeField] GameObject Beam = null;
+	[SerializeField] GameObject BeaconCounter = null;
 	void Update()
 	{
 	}
@@ -17,6 +18,7 @@ public class Beacon_Logic : MonoBehaviour {
 			Debug.Log("Player Touched Beacon. Beacon Now Deactivated.");
 			Beam.SetActive(false);
 			GetComponent<Collider>().enabled = false;
+			BeaconCounter.SendMessage("OnBeaconCollected");
 			//Send Beacon Touched event
 		}
 	}
