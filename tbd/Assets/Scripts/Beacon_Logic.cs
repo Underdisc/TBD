@@ -12,10 +12,8 @@ public class Beacon_Logic : MonoBehaviour {
 	}
 	void OnTriggerEnter(Collider col)
 	{
-		Debug.Log("Hellow yes");
 		if(col.gameObject.tag == "Player")
 		{
-			Debug.Log("Player Touched Beacon. Beacon Now Deactivated.");
 			Beam.SetActive(false);
 			GetComponent<Collider>().enabled = false;
 			BeaconCounter.SendMessage("OnBeaconCollected");

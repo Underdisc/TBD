@@ -56,8 +56,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _ContainMax: 0.75
-    - _ContainMin: 0.25
+    - _ContainCenter: 0.22
+    - _ContainHalfWidth: 0.01
+    - _ContainMax: 0.18
+    - _ContainMin: 0.055
+    - _ContainWidth: 0.024
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
