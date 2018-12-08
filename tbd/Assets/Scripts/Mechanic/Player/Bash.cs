@@ -126,8 +126,8 @@ public class Bash : MonoBehaviour
         {
             // l is our lerp parameter.
             float lp = perc / teleportMidpoint;
-            float lp_quadout = Action.QuadOut(lp);
-            float lp_quadin = Action.QuadIn(lp);
+            float lp_quadout = ActionOperation.QuadOut(lp);
+            float lp_quadin = ActionOperation.QuadIn(lp);
             // Update the player's fov.
             float new_fov = initialFov + lp_quadout * fovRange;
             cameraCamera.fieldOfView = new_fov;
@@ -140,7 +140,7 @@ public class Bash : MonoBehaviour
         {
             // lp is our lerp parameter.
             float lp = (perc - teleportMidpoint) / (1.0f - teleportMidpoint);
-            lp = Action.QuadIn(lp);
+            lp = ActionOperation.QuadIn(lp);
             // Update the player's position.
             Vector3 new_pos = startPosition + lp * deltaPosition;
             this.transform.position = new_pos;

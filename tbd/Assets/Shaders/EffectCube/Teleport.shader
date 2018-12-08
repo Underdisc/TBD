@@ -37,16 +37,6 @@
 			
 			#include "UnityCG.cginc"
 			#include "../Utility.shader"
-			
-			// Project a vector, v, onto a plane with normal, n.
-			float3 project_onto_plane(float3 v, float3 n)
-			{
-				float v_dot_n = dot(v, n);
-				float n_mag = length(n);
-				float a = v_dot_n / (n_mag * n_mag);
-				float3 proj = v - a * n;
-				return proj;
-			}
 
 			struct v2f
 			{

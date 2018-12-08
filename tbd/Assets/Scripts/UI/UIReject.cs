@@ -39,7 +39,7 @@ public class UIReject : MonoBehaviour {
 			return;
 		}
 		float percentage = rejectEffectTimeElapsed / rejectEffectTime;
-		percentage = Action.QuadIn(percentage);
+		percentage = ActionOperation.QuadIn(percentage);
 		Image image_comp = rejectEffect.GetComponent<Image>();
 		image_comp.material.SetFloat("_Percentage", percentage);
 	}

@@ -1,9 +1,11 @@
-﻿Shader "Unlit/Skybox"
+﻿Shader "Skybox/Bars"
 {
     // no Properties block this time!
     Properties
     {
         _Color ("Color", Color) = (1, 1, 1, 1)
+        _BarFrequency("Bar Frequency", Float) = 10.0
+        _NoiseFrequency("Noise Frequency", Float) = 10.0
     }
 
     // A few rules about unity skyboxes.
@@ -19,8 +21,11 @@
             // include file that contains UnityObjectToWorldNormal helper function
             #include "UnityCG.cginc"    
             #include "UnityShaderVariables.cginc"
+            #include "Utility.Shader"
 
             float4 _Color;
+            float _BarFrequency;
+            float _NoiseFrequency;
 
             struct v2f {
                 // we'll output world space normal as one of regular ("texcoord") interpolators
@@ -45,13 +50,20 @@
                 // normal is a 3D vector with xyz components; in -1..1
                 // range. To display it as color, bring the range into 0..1
                 // and put into red, green, blue components
-                
-                float3 direction = i.modelPosition;
+
+                const float3 d_vec = float3(1.0, 0.0, 0.0);
+                float3 direction = float3(i.modelPosition.xyz);
                 direction = normalize(direction);
 
-                float voltage = sin(direction.y * 20 + _Time * 100);
-                float3 color = voltage * _Color.rgb;
-                c.rgb = color;
+                float angle = acos(dot(direction, d_vec));
+                float w = angle * 2.0 * _BarFrequency;
+                float alive = gt(sin(w), 0.0);
+
+                float noise_val = noise(direction.xy * _NoiseFrequency);
+                alive = alive * gt(noise_val, 0.5);
+                
+                
+                c = _Color * alive;
                 return c;
             }
             ENDCG
