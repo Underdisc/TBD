@@ -7,13 +7,12 @@ public class Reject : MonoBehaviour
     public Transform cameraTransform;
     public Camera cameraCamera;
     public Rigidbody objectRigidbody;
-    public float rejectVelocity;
+    public float rejectSpeed;
     public float cooldownTime;
     public int rejectButton = 1;
 
     public GameObject rejectBarrel;
     public GameObject rejectLaserEffect;
-    public GameObject uiObject;
 
     public GameObject rejectorPrefab;
   
@@ -25,14 +24,13 @@ public class Reject : MonoBehaviour
     {
         direction.Normalize();
         Vector3 velocity = objectRigidbody.velocity;
-        velocity += direction * rejectVelocity;
+        velocity = direction * rejectSpeed;
         objectRigidbody.velocity = velocity;
     }
 
     void OnReject(RaycastHit hit_information, Vector3 direction)
     {
         RejectInDirection(direction);
-        uiObject.SendMessage("OnReject");
     }
 
     void TryRaycast()
@@ -84,14 +82,10 @@ public class Reject : MonoBehaviour
         if(cooling)
         {
             cooldownTimePassed += Time.unscaledDeltaTime;
-            float perc = cooldownTimePassed / cooldownTime;
-            uiObject.SendMessage("OnRejectUpdate", perc);
+
             if(cooldownTimePassed > cooldownTime)
             {
-                cooldownTimePassed = 0.0f;
                 cooling = false;
-                uiObject.SendMessage("OnRejectUpdate", 1.0);
-                // We should probably have an effect for when it is done.
             }
             else
             {

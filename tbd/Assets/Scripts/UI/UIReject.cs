@@ -14,15 +14,12 @@ public class UIReject : MonoBehaviour {
 
 	void OnReject()
 	{
+		if(rejectEffect != null)
+		{
+			Destroy(rejectEffect);
+		}
 		rejectEffect = Instantiate(rejectEffectPrefab, gameObject.transform);
 		rejectEffectTimeElapsed = 0.0f;
-	}
-
-	void OnRejectUpdate(float percentage)
-	{
-		// Update the UI to reflect how much energy the player has.
-		Image image_comp = rejectRadialBar.GetComponent<Image>();
-		image_comp.material.SetFloat("_Percentage", percentage);
 	}
 
 	void UpdateRejectEffect()

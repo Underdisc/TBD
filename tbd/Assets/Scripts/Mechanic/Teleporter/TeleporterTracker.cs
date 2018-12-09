@@ -8,6 +8,8 @@ public class TeleporterTracker : MonoBehaviour
 	public GameObject playerCameraObject;
 	
 	private GameObject[] teleportersInViewport;
+	private GameObject[] teleportersInRadius;
+	private GameObject bestTeleporter;
 	private Camera playerCamera;
 	private int numTeleporters;
 	private int inViewportCount;
@@ -38,9 +40,38 @@ public class TeleporterTracker : MonoBehaviour
 	}
 	
 
-	public GameObject ChooseBestTeleporter(float reticule_radius)
+	public GameObject ChooseBestTeleporter()
 	{
-		GameObject best = null;
+		return bestTeleporter;
+	}
+
+	void Start()
+	{
+		playerCamera = playerCameraObject.GetComponent<Camera>();
+		numTeleporters = gameObject.transform.childCount;
+		teleportersInViewport = new GameObject[numTeleporters];
+	}
+
+	void FindInViewport()
+	{
+		inViewportCount = 0;
+		for(int i = 0; i < numTeleporters; ++i)
+		{
+			GameObject teleporter = gameObject.transform.GetChild(i).gameObject;
+			Renderer renderer = teleporter.GetComponent<Renderer>();
+			if(renderer.isVisible)
+			{
+				teleportersInViewport[inViewportCount] = teleporter;
+				inViewportCount++;
+			}
+		}
+	}
+
+	void FindBest()
+	{
+		bestTeleporter = null;
+		Bash bash_comp = player.GetComponent<Bash>();
+		float reticule_radius = bash_comp.radius;
 		float best_dist = float.MaxValue;
 		for(int i = 0; i < inViewportCount; ++i)
 		{
@@ -68,30 +99,13 @@ public class TeleporterTracker : MonoBehaviour
 			{
 				continue;
 			}
-			best = teleporter;
+			bestTeleporter = teleporter;
 		}
-		return best;
-	}
-
-	void Start()
-	{
-		playerCamera = playerCameraObject.GetComponent<Camera>();
-		numTeleporters = gameObject.transform.childCount;
-		teleportersInViewport = new GameObject[numTeleporters];
 	}
 
 	void Update () 
 	{
-		inViewportCount = 0;
-		for(int i = 0; i < numTeleporters; ++i)
-		{
-			GameObject teleporter = gameObject.transform.GetChild(i).gameObject;
-			Renderer renderer = teleporter.GetComponent<Renderer>();
-			if(renderer.isVisible)
-			{
-				teleportersInViewport[inViewportCount] = teleporter;
-				inViewportCount++;
-			}
-		}
+		FindInViewport();
+		FindBest();
 	}
 }

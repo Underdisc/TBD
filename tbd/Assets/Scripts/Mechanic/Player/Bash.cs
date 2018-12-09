@@ -233,7 +233,7 @@ public class Bash : MonoBehaviour
     
     void TryTeleport()
     {
-        GameObject best_teleporter = tracker.ChooseBestTeleporter(radius);
+        GameObject best_teleporter = tracker.ChooseBestTeleporter();
         reticleMaterial.SetFloat("_ContainMax", radius);
         if(best_teleporter == null)
         {
@@ -264,6 +264,17 @@ public class Bash : MonoBehaviour
 
     void Update()
     {
+        // Set the color of the reticle if a teleporter is within range.
+        GameObject bestTeleporter = tracker.ChooseBestTeleporter();
+        if(bestTeleporter != null)
+        {
+            reticleMaterial.SetVector("_Color", Color.blue);
+        }
+        else
+        {
+            reticleMaterial.SetVector("_Color", Color.white);
+        }
+        
         // If the player is in the middle of a teleport, continue performing the
         // teleport. If not, check for a teleport request.
         if(performingTeleport)
