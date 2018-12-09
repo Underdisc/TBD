@@ -66,7 +66,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4729039324969320}
-  - component: {fileID: 114435090978244916}
   - component: {fileID: 114969065130365088}
   - component: {fileID: 114029532934855606}
   - component: {fileID: 114396668476336860}
@@ -329,13 +328,18 @@ MonoBehaviour:
   cameraTransform: {fileID: 4721298652206848}
   cameraCamera: {fileID: 20538025589694112}
   objectRigidbody: {fileID: 54691481887123886}
-  rejectVelocity: 16.17
-  cooldownTime: 0.5
+  range: 5
+  rejectSpeed: 18.5
+  pipTime: 1.03
+  pipHolderImage: {fileID: 0}
+  pipImages:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   rejectButton: 1
   rejectBarrel: {fileID: 1022018170207100}
   rejectLaserEffect: {fileID: 1876234172624246, guid: 0bb54686fc8fb164ca9eb52e16047f4b,
     type: 2}
-  uiObject: {fileID: 0}
   rejectorPrefab: {fileID: 1101641595460486, guid: ad37d56d0a9cd594392d7887989c58f7,
     type: 2}
 --- !u!114 &114107890531442722
@@ -377,23 +381,6 @@ MonoBehaviour:
   airAcceleration: 10
   gravityAcceleration: -15
   drag: 0
---- !u!114 &114435090978244916
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1684012198556616}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e97e619b6baaae4581dc5f23ab14c86, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  uiObject: {fileID: 0}
-  bulletTimeScale: 0.05
-  maxEnergy: 100
-  depletionRate: 25
-  regenerationRate: 25
-  bulletTimeKey: 101
 --- !u!114 &114796897816924330
 MonoBehaviour:
   m_ObjectHideFlags: 1
