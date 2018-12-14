@@ -159,15 +159,15 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1684012198556616}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalRotation: {x: 0, y: -0.53729963, z: 0, w: 0.8433914}
+  m_LocalPosition: {x: 6.27, y: 1, z: -5.73}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4721298652206848}
   - {fileID: 4701010410926650}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -65, z: 0}
 --- !u!20 &20538025589694112
 Camera:
   m_ObjectHideFlags: 1
@@ -408,6 +408,9 @@ MonoBehaviour:
   camera: {fileID: 1918152130175854}
   cameraTransform: {fileID: 4721298652206848}
   cameraCamera: {fileID: 20538025589694112}
+  uiImages:
+  - {fileID: 0}
+  - {fileID: 0}
   bashEndSpeed: 5.5
   bashTime: 5
   teleportTime: 0.65
@@ -418,6 +421,7 @@ MonoBehaviour:
   teleportEffectDissolveTime: 0.1
   teleportButton: 0
   radius: 0.18
+  range: 20
   teleportLaserEffect: {fileID: 1530921233024676, guid: 376fec43bc4c4cd429d57d435bbf1be3,
     type: 2}
   teleportEffectCube: {fileID: 1003632111876020, guid: 5dece4af985acb843bf85108f84544c4,

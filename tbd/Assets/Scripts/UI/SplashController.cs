@@ -81,7 +81,7 @@ public class SplashController : MonoBehaviour
 	{
 		if(timeElapsed >= sustainTime)
 		{
-			if(cSplash + 1 >= splash.Length)
+			if((cSplash + 1) >= splash.Length)
 			{
 				SceneManager.LoadScene(nextScene);
 			}

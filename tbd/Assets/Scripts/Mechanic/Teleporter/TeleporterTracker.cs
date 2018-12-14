@@ -13,6 +13,7 @@ public class TeleporterTracker : MonoBehaviour
 	private Camera playerCamera;
 	private int numTeleporters;
 	private int inViewportCount;
+	private float teleportRange;
 
 	public GameObject Raycast(Ray ray)
 	{
@@ -50,6 +51,8 @@ public class TeleporterTracker : MonoBehaviour
 		playerCamera = playerCameraObject.GetComponent<Camera>();
 		numTeleporters = gameObject.transform.childCount;
 		teleportersInViewport = new GameObject[numTeleporters];
+		Bash bash_comp = player.GetComponent<Bash>();
+		teleportRange = bash_comp.range;
 	}
 
 	void FindInViewport()
@@ -89,8 +92,8 @@ public class TeleporterTracker : MonoBehaviour
 			Vector3 player_pos = player.transform.position;
 			Vector3 teleporter_pos = teleporter.transform.position;
 			Vector3 p_t_d = player_pos - teleporter_pos;
-			float dist = p_t_d.sqrMagnitude;
-			if(dist > best_dist)
+			float dist = Mathf.Sqrt(p_t_d.sqrMagnitude);
+			if(dist > teleportRange || dist > best_dist)
 			{
 				continue;
 			}

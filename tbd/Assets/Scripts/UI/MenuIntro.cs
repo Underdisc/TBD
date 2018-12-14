@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuIntro : MonoBehaviour 
@@ -26,6 +27,83 @@ public class MenuIntro : MonoBehaviour
 
     private delegate void VoidVoidFunction();
     private VoidVoidFunction stage;
+
+    public Button startButton;
+    public Button howToPlayButton;
+    public Button exitButton;
+    public Button backButton;
+
+    public GameObject buttons;
+    public Transform buttonsOn;
+    public Transform buttonsOff;
+    public GameObject howToPlay;
+    public Transform howToPlayOn;
+    public Transform howToPlayOff;
+    public float howToPlayTransitionTime;
+
+    private bool performingAction = true;
+
+    void LerpTo(GameObject thing, Transform start_trans, Transform end_trans, float perc)
+    {
+        Vector3 start = start_trans.position;
+        Vector3 end = end_trans.position;
+        Vector3 delta = end - start;
+        Vector3 pos = start + delta * perc;
+        thing.transform.position = pos;
+    }
+
+    void HowToPlayTransition()
+    {
+        if(timeElapsed > howToPlayTransitionTime)
+        {
+            howToPlay.transform.position = howToPlayOn.position;
+            buttons.transform.position = buttonsOff.position;
+            performingAction = false;
+        }
+        float perc = timeElapsed / howToPlayTransitionTime;
+        perc = ActionOperation.QuadOutIn(perc);
+        LerpTo(buttons, buttonsOn, buttonsOff, perc);
+        LerpTo(howToPlay, howToPlayOff, howToPlayOn, perc);
+    }
+
+    void BackTransition()
+    {
+        if(timeElapsed > howToPlayTransitionTime)
+        {
+            howToPlay.transform.position = howToPlayOff.position;
+            buttons.transform.position = buttonsOn.position;
+            performingAction = false;
+        }
+        float perc = timeElapsed / howToPlayTransitionTime;
+        perc = ActionOperation.QuadOutIn(perc);
+        LerpTo(buttons, buttonsOff, buttonsOn, perc);
+        LerpTo(howToPlay, howToPlayOn, howToPlayOff, perc);
+    }
+
+    void OnBack()
+    {
+        stage = BackTransition;
+        performingAction = true;
+        timeElapsed = 0.0f;
+    }
+
+    void OnStart()
+    {
+        SceneManager.LoadScene("Arena");
+    }
+
+    void OnHowToPlay()
+    {
+        stage = HowToPlayTransition;
+        performingAction = true;
+        timeElapsed = 0.0f;
+    }
+
+    void OnExit()
+    {
+        Application.Quit();
+    }
+
 
     void Start () 
     {
@@ -65,6 +143,11 @@ public class MenuIntro : MonoBehaviour
             {
                 moverTrans[i].position = endPositions[i];
             }
+            startButton.onClick.AddListener(OnStart);
+            howToPlayButton.onClick.AddListener(OnHowToPlay);
+            exitButton.onClick.AddListener(OnExit);
+            backButton.onClick.AddListener(OnBack);
+            performingAction = false;
             return;
         }
 
@@ -109,7 +192,10 @@ public class MenuIntro : MonoBehaviour
     
     void Update () 
     {
-        timeElapsed += Time.deltaTime;
-        stage();
+        if(performingAction)
+        {
+            timeElapsed += Time.deltaTime;
+            stage();
+        }
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Toggle : MonoBehaviour 
 {
+    public bool disableCursor;
 
     public KeyCode cursorToggle;
     private bool cursorToggled = false;
@@ -26,6 +27,15 @@ public class Toggle : MonoBehaviour
         if(Input.GetKeyDown(cursorToggle))
         {
             ToggleCursor();
+        }
+    }
+
+    void Start()
+    {
+        if(disableCursor)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 }

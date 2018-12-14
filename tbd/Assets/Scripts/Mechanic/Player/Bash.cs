@@ -16,6 +16,12 @@ public class Bash : MonoBehaviour
     public Transform cameraTransform;
     public Camera cameraCamera;
 
+    public Image[] uiImages;
+
+    public float bashEndTime;
+    private float bashEndTimeElapsed;
+    private float bashEndStartFov;
+
     // Bash options.
     public float bashEndSpeed;
     public float bashTime;
@@ -31,6 +37,7 @@ public class Bash : MonoBehaviour
     // Teleport ability optins.
     public int teleportButton = 0; 
     public float radius;
+    public float range;
 
     // Effect prefabs.
     public GameObject teleportLaserEffect;
@@ -54,6 +61,7 @@ public class Bash : MonoBehaviour
     private float bashTimeElapsed;
     private bool testTeleport = false;
     private bool performingTeleport = false;
+    private bool endingTeleport = false;
     private float originalTimeScale;
     private float teleportTimeElapsed;
     private float timeInTeleport;
@@ -76,9 +84,34 @@ public class Bash : MonoBehaviour
     private delegate void TeleportStageDelegate();
     private TeleportStageDelegate teleportStage;
 
+    void SetTransparencies(float transparency)
+    {
+        foreach(Image image_comp in uiImages)
+        {
+            Color color = image_comp.color;
+            color[3] = transparency;
+            image_comp.color = color;
+        }
+    }
+
+    void EndingTeleport()
+    {
+        bashEndTimeElapsed += Time.unscaledDeltaTime;
+        if(bashEndTimeElapsed >= bashEndTime)
+        {
+            endingTeleport = false;
+            cameraCamera.fieldOfView = initialFov;
+        }
+        float lerp = bashEndTimeElapsed / bashEndTime;
+        cameraCamera.fieldOfView = Mathf.Lerp(bashEndStartFov, initialFov, lerp);
+    }
+
     void EndTeleport()
     {
         performingTeleport = false;
+        endingTeleport = true;
+        bashEndStartFov = cameraCamera.fieldOfView;
+        bashEndTimeElapsed = 0.0f;
         Vector3 center_p = new Vector3(0.5f, 0.5f, cameraTransform.position.z);
         Ray ray = cameraCamera.ViewportPointToRay(center_p);
         float player_speed = bashEndSpeed;
@@ -87,7 +120,6 @@ public class Bash : MonoBehaviour
         Time.timeScale = originalTimeScale;
         Destroy(effectCube);
         Destroy(teleportCollider);
-
         // Tell the telelporter that the player has performed their bash.
         teleporter.OnBash();
     }
@@ -95,6 +127,10 @@ public class Bash : MonoBehaviour
     void TeleportStage1()
     {
         bashTimeElapsed += Time.unscaledDeltaTime;
+        float perc = bashTimeElapsed / bashTime;
+        float lerp = ActionOperation.QuadOut(perc);
+        float new_fov = initialFov + lerp * fovRange;
+        cameraCamera.fieldOfView = new_fov;
         if(bashTimeElapsed >= bashTime || 
            Input.GetMouseButtonDown(teleportButton))
         {
@@ -269,10 +305,12 @@ public class Bash : MonoBehaviour
         if(bestTeleporter != null)
         {
             reticleMaterial.SetVector("_Color", Color.blue);
+            SetTransparencies(1.0f);
         }
         else
         {
             reticleMaterial.SetVector("_Color", Color.white);
+            SetTransparencies(0.5f);
         }
         
         // If the player is in the middle of a teleport, continue performing the
@@ -290,6 +328,12 @@ public class Bash : MonoBehaviour
         if(teleportEffectDissolving)
         {
             DissolveTeleportEffect();
+        }
+
+        // Scale back the fov.
+        if(endingTeleport)
+        {
+            EndingTeleport();
         }
         
     }

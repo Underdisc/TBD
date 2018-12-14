@@ -59,6 +59,8 @@ public class Controller : MonoBehaviour
     public Rigidbody rigidbody;
     public HeadBob headBob;
 
+    public bool run = true;
+
     // Should be seperated from the controller
     public float bounceSpeed;
     public float maxBounceSpeed;
@@ -246,6 +248,10 @@ public class Controller : MonoBehaviour
 
     void Update () 
     {
+        if(!run)
+        {
+            return;
+        }
         // This function is for testing and should be removed for the actual
         // game.
         CheckRespawn();
